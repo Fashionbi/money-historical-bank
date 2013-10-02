@@ -60,10 +60,12 @@ class Money
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
         @mutex.synchronize do
-          unless existing_rates = @rates[date.to_s]
+
+          if (existing_rates = @rates[date.to_s]).nil?
             load_data(date)
             existing_rates = @rates[date.to_s]
           end
+
           rate = nil
           if existing_rates
             rate = existing_rates[rate_key_for(from, to)]
@@ -176,7 +178,7 @@ class Money
       #
       #   s = bank.export_rates(:json)
       #   s #=> "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
-      def export_rates(format, file=nil)
+      def export_rates(format, date, file=nil)
         raise Money::Bank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
@@ -184,11 +186,11 @@ class Money
         @mutex.synchronize {
           s = case format
               when :json
-                JSON.dump(@rates)
+                JSON.dump(@rates[date.to_s])
               when :ruby
-                Marshal.dump(@rates)
+                Marshal.dump(@rates[date.to_s])
               when :yaml
-                YAML.dump(@rates)
+                YAML.dump(@rates[date.to_s])
               end
 
           unless file.nil?
@@ -211,16 +213,16 @@ class Money
       # @example
       #   s = "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
       #   bank = Money::Bank::VariableExchange.new
-      #   bank.import_rates(:json, s)
+      #   bank.import_rates(:json, Date.today, s)
       #
       #   bank.get_rate("USD", "CAD") #=> 1.24515
       #   bank.get_rate("CAD", "USD") #=> 0.803115
-      def import_rates(format, s)
+      def import_rates(format, date, s)
         raise Money::Bank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
         @mutex.synchronize {
-          @rates = case format
+          @rates[date.to_s] = case format
                    when :json
                      JSON.load(s)
                    when :ruby

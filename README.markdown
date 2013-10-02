@@ -7,6 +7,7 @@ A gem that add a `Money::Bank` able to handle historical rates, and infer rates 
 * If no rates exist for a given date, the gem will try to download historical rates from [open-exchange-rates](http://josscrowcroft.github.com/open-exchange-rates/)
 * The gem is able to guess inverse rates (EURUSD rate when only USDEUR is present), and go through USD when using other pairs. For example, GBPEUR will be calculated using USDGBP and USDEUR. This strategy isn't used if said rate (GBPEUR) is already set.
 * No caching exists, but you can use `import_data` and `export_data` the same way `Money::Bank::VariableExchange` works.
+* Allows to import rates of a specific date, usefull if you save the rates in a database and require them on need.
 
 ## Usage
 
@@ -14,11 +15,11 @@ A gem that add a `Money::Bank` able to handle historical rates, and infer rates 
 require 'money/bank/historical_bank'
 mh = Money::Bank::HistoricalBank.new
 
-# Exchanges 1000 EUR to USD using Date.today (default if no date has been entered).
-# Will download today's rates if none have been entered
+### Exchanges 1000 EUR to USD using Date.today (default if no date has been entered).
+### Will download today's rates if none have been entered
 mh.exchange_with(1000.to_money('EUR'), 'USD')
 
-# Exchanges 1000 EUR to USD using historical rates
+### Exchanges 1000 EUR to USD using historical rates
 date = Date.new(2009,9,9)
 mh.set_rate(date, 'USD', 'EUR', 0.7634)
 mh.exchange_with(date, 1000.to_money('USD'), 'EUR') # => 763.4 EUR

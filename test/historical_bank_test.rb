@@ -50,7 +50,6 @@ describe Money::Bank::HistoricalBank do
   end
 
   describe 'no rates available yet' do
-    include RR::Adapters::TestUnit
     before do
       @bank = Money::Bank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
@@ -93,8 +92,11 @@ describe Money::Bank::HistoricalBank do
       @bank.set_rate(d1, "USD", "EUR", 1.234)
       @bank.set_rate(d2, "GBP", "USD", 1.456)
 
-      json = @bank.export_rates(:json)
-      @bank.import_rates(:json, json)
+      json1 = @bank.export_rates(:json, d1)
+      json2 = @bank.export_rates(:json, d2)
+
+      @bank.import_rates(:json, d1, json1)
+      @bank.import_rates(:json, d2, json2)
 
       @bank.get_rate(d1, "USD", "EUR").must_equal 1.234
       @bank.get_rate(d2, "GBP", "USD").must_equal 1.456

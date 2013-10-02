@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "money-historical-bank"
-  s.version = "0.0.3"
+  s.version = "0.1.0"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/atwam/#{s.name}"
   s.authors = "atwam"
